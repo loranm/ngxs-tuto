@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
+import { filter, Observable, tap } from 'rxjs';
 import { AddAnimal } from './state/animal.actions';
+import { ZooStateModel } from './state/animal.state';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +11,11 @@ import { AddAnimal } from './state/animal.actions';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'ngxs-tuto';
-
   form!: FormGroup;
+
+  animals$: Observable<any> = this.store
+    .select((state): any => state.zoo.animals)
+    .pipe(filter((animals) => Boolean(animals.length)));
 
   get animalName(): string {
     return this.form.get('name')?.value;
@@ -28,10 +32,17 @@ export class AppComponent implements OnInit {
   }
 
   buildForm() {
-    this.form = new FormGroup({ name: new FormControl('') });
+    this.form = new FormGroup({
+      name: new FormControl('', Validators.required),
+    });
   }
 
   submit() {
+    if (this.form.invalid) {
+      return;
+    }
+
     this.addAnimal(this.animalName);
+    this.form.reset();
   }
 }

@@ -16,5 +16,16 @@
         </form>
       </article>
     </article>
+
+    <ng-container *ngIf="animals$ | async as animals">
+      <article>
+        <h2>List of animals</h2>
+        <ul>
+          <li *ngFor="let animal of animals">
+            {{ animal }}
+          </li>
+        </ul>
+      </article>
+    </ng-container>
   </section>
 </main>
